@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>公司财务情况一览 · 五公司 2025-08~2026-08</title>
+<style>
+  :root{
+    --ink:#0f172a; --sub:#475569; --faint:#94a3b8;
+    --line:#e2e8f0; --line2:#cbd5e1; --bg:#f8fafc; --card:#ffffff;
+    --in:#0d9488; --in-bg:#f0fdfa; --out:#dc2626; --out-bg:#fef2f2;
+    --loan:#d97706; --invest:#7c3aed; --fee:#0891b2;
+    --bar:52px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    color:var(--ink);background:var(--bg);line-height:1.6;font-size:14px;overflow:hidden}
+  .num{font-family:"SF Mono",Menlo,Consolas,"PingFang SC",monospace;font-feature-settings:"tnum";letter-spacing:-.02em}
+
+  /* ---------- 顶栏 ---------- */
+  .topbar{position:fixed;top:0;left:0;right:0;height:var(--bar);display:flex;align-items:center;gap:12px;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);z-index:100;padding:0 14px}
+  .topbar .brand{font-size:15px;font-weight:800;white-space:nowrap;letter-spacing:1px;display:flex;align-items:center;gap:8px}
+  .topbar .brand::before{content:"";width:10px;height:10px;border-radius:3px;background:linear-gradient(135deg,#2563EB,#16A34A)}
+  .topbar nav{flex:1;display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+  .topbar nav::-webkit-scrollbar{display:none}
+  .topbar nav a{flex:none;font-size:12.5px;color:var(--sub);text-decoration:none;padding:6px 11px;border-radius:999px;
+    white-space:nowrap;cursor:pointer;transition:background .12s,color .12s;user-select:none}
+  .topbar nav a:hover{color:var(--ink);background:#f1f5f9}
+  .topbar nav a.on{color:#fff;background:var(--ink);font-weight:700}
+  .topbar .btns{display:flex;gap:6px;flex:none;align-items:center}
+  .topbar .btns button{background:#fff;border:1px solid var(--line);border-radius:999px;font-size:12px;font-weight:700;
+    color:var(--sub);padding:5px 12px;cursor:pointer;font-family:inherit;white-space:nowrap}
+  .topbar .btns button:hover{color:var(--ink);border-color:var(--faint)}
+  .topbar .pager{font-size:11.5px;color:var(--faint);min-width:38px;text-align:center}
+
+  /* ---------- 面板切换 ---------- */
+  .viewport{position:fixed;top:var(--bar);left:0;right:0;bottom:0;overflow:hidden}
+  .panels{display:flex;height:100%;transition:transform .35s cubic-bezier(.22,.61,.36,1)}
+  .panel{flex:0 0 100%;height:100%;overflow-y:auto;padding:24px 22px 80px}
+  .navbtn{position:fixed;top:50%;transform:translateY(-50%);z-index:90;width:40px;height:40px;border-radius:50%;
+    background:rgba(255,255,255,.92);border:1px solid var(--line);box-shadow:0 2px 8px rgba(15,23,42,.14);
+    font-size:18px;color:var(--sub);cursor:pointer;display:flex;align-items:center;justify-content:center;user-select:none}
+  .navbtn:hover{color:var(--ink);background:#fff}
+  .navbtn.prev{left:10px}.navbtn.next{right:10px}
+
+  .wrap{max-width:1240px;margin:0 auto}
+  h2.pt{font-size:19px;font-weight:800;margin:2px 0 4px;display:flex;align-items:center;gap:10px}
+  h2.pt .dot{width:11px;height:11px;border-radius:3px;flex:none}
+  .psub{color:var(--sub);font-size:12.5px;margin-bottom:18px}
+  .psub b{color:var(--ink)}
+
+  /* ---------- 卡片 ---------- */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04)}
+  .card h3{font-size:13.5px;font-weight:700;color:var(--sub);margin-bottom:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .card h3 .r{margin-left:auto;font-size:11.5px;color:var(--faint);font-weight:400}
+  .grid{display:grid;gap:14px}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:12px;margin-bottom:16px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .kpi .k{font-size:11.5px;color:var(--sub)}
+  .kpi .v{font-size:20px;font-weight:800;margin-top:2px}
+  .kpi .s{font-size:11px;color:var(--faint);margin-top:2px}
+  .kpi.hl{background:linear-gradient(135deg,#0f172a,#1e293b);border-color:#0f172a}
+  .kpi.hl .k,.kpi.hl .s{color:#94a3b8}.kpi.hl .v{color:#fff}
+
+  .co-card{position:relative;overflow:hidden}
+  .co-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cc,#2563EB)}
+  .co-card .nm{font-weight:800;font-size:14px;display:flex;align-items:center;gap:7px;margin-bottom:8px}
+  .co-card .nm .tag{font-size:10px;color:#fff;background:var(--cc,#2563EB);border-radius:4px;padding:1px 6px;font-weight:600}
+  .co-card .row{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);padding:1.5px 0}
+  .co-card .row b{font-weight:600;color:var(--ink)}
+
+  .chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 9px;border-radius:999px;
+    border:1px solid var(--line2);color:var(--sub);background:#fff}
+  .chip .d{width:7px;height:7px;border-radius:2px}
+  .chip.in{background:var(--in-bg);border-color:#99f6e4;color:#0f766e}
+  .chip.out{background:var(--out-bg);border-color:#fecaca;color:#b91c1c}
+  .chip.loan{background:#fffbeb;border-color:#fde68a;color:#92400e}
+  .chip.invest{background:#f5f3ff;border-color:#ddd6fe;color:#6d28d9}
+  .chip.fee{background:#ecfeff;border-color:#a5f3fc;color:#155e75}
+
+  /* ---------- 图表 ---------- */
+  .chart{width:100%}
+  .chart text{font-family:inherit}
+  .chart .axis{stroke:#e2e8f0;stroke-width:1}
+  .chart .gridline{stroke:#eef2f7;stroke-width:1}
+  .chart .xlabel{font-size:10px;fill:#94a3b8}
+  .chart .ylabel{font-size:10px;fill:#94a3b8}
+  .chart .bar{cursor:pointer;transition:opacity .15s}
+  .chart .bar:hover{opacity:.75}
+  .chart .slab{font-size:10.5px;font-weight:600}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 10px;margin-top:8px}
+  .legend .li{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--sub)}
+  .legend .li .d{width:9px;height:9px;border-radius:2.5px}
+  .donut-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .donut-wrap svg{flex:none}
+  .dlegend{display:grid;gap:4px;font-size:12px}
+  .dlegend .li{display:flex;align-items:center;gap:7px;cursor:pointer}
+  .dlegend .li:hover{background:#f8fafc}
+  .dlegend .li .d{width:9px;height:9px;border-radius:2.5px;flex:none}
+  .dlegend .li .nm{color:var(--sub);min-width:9.5em}
+  .dlegend .li .pc{color:var(--ink);font-weight:700;margin-left:auto}
+
+  .row3{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:14px}
+  @media(max-width:1080px){.row3{grid-template-columns:1fr 1fr}.row3>*:last-child{grid-column:1/-1}}
+  @media(max-width:740px){.row3{grid-template-columns:1fr}}
+  .hbar-row{display:grid;grid-template-columns:minmax(0,10.5em) minmax(56px,1fr) 6.8em 3.9em;gap:7px;align-items:center;
+    padding:5px 6px;border-radius:8px;cursor:pointer;font-size:12px}
+  .hbar-row:hover{background:#f8fafc}
+  .hbar-row.on{background:#eff6ff}
+  .hbar-row .nm{color:var(--sub);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:6px}
+  .hbar-row .nm .d{width:9px;height:9px;border-radius:2.5px;flex:none}
+  .hbar-row .track{height:13px;background:#f1f5f9;border-radius:4px;overflow:hidden}
+  .hbar-row .fill{height:100%;border-radius:4px;transition:width .5s}
+  .hbar-row .amt{color:var(--ink);font-weight:600;text-align:right}
+  .hbar-row .pct{color:var(--faint);text-align:right}
+
+  /* ---------- 表格 ---------- */
+  table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.t th{font-size:11px;color:var(--sub);font-weight:600;text-align:left;padding:7px 8px;border-bottom:1.5px solid var(--line2);
+    white-space:nowrap;position:sticky;top:0;background:#fff;z-index:2}
+  table.t td{padding:6px 8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+  table.t tr:hover td{background:#f8fafc}
+  table.t td.r,table.t th.r{text-align:right}
+  table.t .io-in{color:var(--in);font-weight:700}
+  table.t .io-out{color:var(--out);font-weight:700}
+  table.t .cat-tag{display:inline-block;font-size:10.5px;padding:0 7px;border-radius:4px;white-space:nowrap;
+    background:#f1f5f9;color:var(--sub);border:1px solid var(--line)}
+  .tbl-scroll{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+
+  /* ---------- 筛选器 ---------- */
+  .filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px}
+  .filters select,.filters input{font-family:inherit;font-size:12.5px;color:var(--ink);background:#fff;
+    border:1px solid var(--line2);border-radius:8px;padding:5px 9px;outline:none}
+  .filters select:focus,.filters input:focus{border-color:#2563EB}
+  .filters input{width:170px}
+  .filters .fgap{flex:1}
+  .filters .rst{font-size:11.5px;color:#2563EB;cursor:pointer;border:none;background:none;font-family:inherit}
+  .ftotal{font-size:12px;color:var(--sub);margin:10px 2px 0}
+  .ftotal b{color:var(--ink)}
+  .pagerow{display:flex;gap:6px;align-items:center;justify-content:flex-end;margin-top:10px;font-size:12px;color:var(--sub)}
+  .pagerow button{font-family:inherit;font-size:12px;border:1px solid var(--line2);background:#fff;color:var(--sub);
+    border-radius:6px;padding:3px 10px;cursor:pointer}
+  .pagerow button:disabled{opacity:.4;cursor:default}
+
+  /* ---------- 往来 ---------- */
+  .debt-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .debt-card .amt{font-size:21px;font-weight:800;margin:2px 0 6px}
+  .debt-card .pair{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .debt-card .pair .arr{color:var(--faint);font-weight:400}
+  .debt-card .ev{font-size:11.5px;color:var(--sub);margin-top:6px}
+  .debt-card .ev::before{content:"依据 ";color:var(--faint)}
+  .flow-box{overflow-x:auto}
+  .note-list{margin:0;padding-left:18px;font-size:12.5px;color:var(--sub);display:grid;gap:7px}
+  .note-list li::marker{color:#2563EB}
+
+  /* ---------- 提示框 ---------- */
+  #tip{position:fixed;z-index:200;pointer-events:none;background:#0f172af2;color:#fff;border-radius:9px;
+    padding:8px 11px;font-size:12px;line-height:1.55;display:none;max-width:280px;box-shadow:0 6px 20px rgba(0,0,0,.25)}
+  #tip .tt{font-weight:700;margin-bottom:3px}
+  #tip .tr{display:flex;justify-content:space-between;gap:14px}
+  #tip .tr .lb{color:#cbd5e1}
+  #tip .tr .vl{font-weight:600}
+
+  .foot{margin-top:26px;padding-top:14px;border-top:1px dashed var(--line2);font-size:11.5px;color:var(--faint);line-height:1.8}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .three-col{display:grid;grid-template-columns:1.25fr 1fr .95fr;gap:14px}
+  @media(max-width:980px){.two-col,.three-col{grid-template-columns:1fr}}
+  .muted{color:var(--faint);font-size:11.5px}
+
+  /* ---------- ⑫ 登录门 ---------- */
+  #gate{position:fixed;inset:0;z-index:500;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(160deg,#0f172a 0%,#1e293b 55%,#0f172a 100%)}
+  #gate .gbox{width:min(360px,92vw);background:#fff;border-radius:18px;padding:30px 28px 26px;
+    box-shadow:0 24px 70px rgba(0,0,0,.45)}
+  #gate .glogo{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+  #gate .glogo::before{content:"";width:12px;height:12px;border-radius:3.5px;background:linear-gradient(135deg,#2563EB,#16A34A)}
+  #gate h1{font-size:16.5px;font-weight:800;letter-spacing:.5px}
+  #gate .gsub{font-size:11.5px;color:var(--faint);margin:2px 0 18px}
+  #gate label{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-weight:600}
+  #gate input{width:100%;box-sizing:border-box;font-family:inherit;font-size:14px;padding:9px 12px;
+    border:1.5px solid var(--line2);border-radius:10px;outline:none;transition:border-color .15s}
+  #gate input:focus{border-color:#2563EB}
+  #gate .gerr{font-size:12px;color:#dc2626;margin-top:10px;min-height:16px}
+  #gate .grow{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+  #gate .greme{font-size:12px;color:var(--sub);display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none}
+  #gate .greme input{width:auto;accent-color:#2563EB}
+  #gate button.gbtn{width:100%;margin-top:18px;font-family:inherit;font-size:14px;font-weight:700;color:#fff;
+    background:#0f172a;border:none;border-radius:10px;padding:10px 0;cursor:pointer;transition:opacity .15s}
+  #gate button.gbtn:hover{opacity:.92}
+  #gate.shake .gbox{animation:gshake .4s}
+  @keyframes gshake{0%,100%{transform:translateX(0)}20%{transform:translateX(-9px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(4px)}}
+  #gate .gfoot{margin-top:16px;text-align:center;font-size:10.5px;color:var(--faint)}
+  .btn-logout{display:none}
+  body.authed .btn-logout{display:inline-block}
+
+  /* ---------- ⑧ 打印：只打印当前面板 ---------- */
+  @media print{
+    .topbar,.navbtn,#tip,.pagerow{display:none!important}
+    html,body{overflow:visible;height:auto;background:#fff}
+    .viewport{position:static;overflow:visible}
+    .panels{display:block;transform:none!important;transition:none}
+    .panel{display:none}
+    .panel.cur{display:block;overflow:visible;height:auto;padding:0}
+    .panel.cur .wrap{max-width:none}
+    .card{break-inside:avoid;page-break-inside:avoid;box-shadow:none;border-color:#d8dee9}
+    .tbl-scroll{max-height:none!important;overflow:visible!important;border:none}
+    table.t tr{break-inside:avoid}
+    .chart{max-width:100%}
+    a{color:inherit;text-decoration:none}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">公司财务情况一览</div>
+  <nav id="topnav"></nav>
+  <div class="btns">
+    <span class="pager num" id="pager">1 / 7</span>
+    <button id="btnPrev">‹ 上一页</button>
+    <button id="btnNext">下一页 ›</button>
+    <button class="btn-logout" id="btnLogout" title="退出登录">退出</button>
+  </div>
+</div>
+
+<div class="viewport">
+  <div class="panels" id="panels"></div>
+</div>
+<div class="navbtn prev" id="navPrev">‹</div>
+<div class="navbtn next" id="navNext">›</div>
+<div id="tip"></div>
+
+<div id="gate">
+  <div class="gbox">
+    <div class="glogo"><h1>公司财务情况一览</h1></div>
+    <div class="gsub">五公司银行流水 · 数据涉密，请登录查看</div>
+    <label for="gUser">账号</label>
+    <input id="gUser" autocomplete="username" spellcheck="false">
+    <label for="gPass">密码</label>
+    <input id="gPass" type="password" autocomplete="current-password">
+    <div class="gerr" id="gErr"></div>
+    <div class="grow">
+      <label class="greme"><input type="checkbox" id="gRem"> 记住我（本机免登录）</label>
+    </div>
+    <button class="gbtn" id="gGo">登 录</button>
+    <div class="gfoot">数据经 AES-256-GCM 加密 · 密码正确方可解密 · 关闭浏览器后自动登出</div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
