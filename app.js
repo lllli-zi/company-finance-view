@@ -630,35 +630,13 @@ function panelInter(){
         '<td style="font-size:11.5px;color:#64748b">'+esc(b.read)+'</td>'))});
     bt.appendChild(bb);bc.appendChild(bt);w.appendChild(bc)}
 
-  // 对账说明 + ⑩ 待办状态位（localStorage 持久化）
+  // 对账说明（源自《公司间借款往来整理》）
   if(D.inter.notes&&D.inter.notes.length){
     var nc=el('div','card');nc.style.marginTop='14px';
-    nc.appendChild(el('h3','','对账结论与待办'));
+    nc.appendChild(el('h3','','对账结论'));
     var ol=el('ul','note-list');
     D.inter.notes.forEach(function(n){ol.appendChild(el('li','',esc(n)))});
     nc.appendChild(ol);
-    if(D.todos&&D.todos.length){
-      var saved={};try{saved=JSON.parse(localStorage.getItem('finTodos')||'{}')}catch(e){}
-      var tl=el('div','');tl.style.cssText='margin-top:12px;padding-top:10px;border-top:1px dashed #e2e8f0;display:grid;gap:6px';
-      D.todos.forEach(function(t){
-        var done=saved[t.id]==='done';
-        var row=el('label','');
-        row.style.cssText='display:flex;gap:8px;align-items:flex-start;font-size:12.5px;cursor:pointer;color:'+(done?'#94a3b8':'#334155');
-        row.innerHTML='<input type="checkbox" '+(done?'checked':'')+' style="margin-top:3px;accent-color:#0d9488"> '+
-          '<span style="'+(done?'text-decoration:line-through':'')+'">'+esc(t.txt)+'</span>'+
-          '<span class="chip" style="margin-left:auto;flex:none;'+(done?'background:#f0fdfa;border-color:#99f6e4;color:#0f766e':'background:#fffbeb;border-color:#fde68a;color:#92400e')+'">'+(done?'已完成':'待处理')+'</span>';
-        row.querySelector('input').onchange=function(){
-          saved[t.id]=this.checked?'done':'open';
-          try{localStorage.setItem('finTodos',JSON.stringify(saved))}catch(e){}
-          this.closest('label').style.color=this.checked?'#94a3b8':'#334155';
-          var sp=this.closest('label').querySelector('span');
-          sp.style.textDecoration=this.checked?'line-through':'';
-          var chip=this.closest('label').querySelector('.chip');
-          chip.textContent=this.checked?'已完成':'待处理';
-          chip.style.cssText=chip.style.cssText.replace(/background:[^;]+;border-color:[^;]+;color:[^;]+/,
-            this.checked?'background:#f0fdfa;border-color:#99f6e4;color:#0f766e':'background:#fffbeb;border-color:#fde68a;color:#92400e')};
-        tl.appendChild(row)});
-      nc.appendChild(tl)}
     w.appendChild(nc)}
   w.appendChild(el('div','foot',
     '往来口径：① 摘要「往来款」计借款；「服务费」为业务往来不计借款；「投资款」单列。② 银行流水显示借款均<b>零还款</b>（无反方向转账）。③ 核对表合计：借款 683,150（含洛克思垫付 200，其中模盾借款 556,800）＋投资款 486,000＋服务费 157,000。'));
