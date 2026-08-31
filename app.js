@@ -802,7 +802,6 @@ document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   if(e.key==='ArrowLeft')goTo(cur-1);
   if(e.key==='ArrowRight')goTo(cur+1)});
-var h=location.hash.slice(1);
-goTo(panelEls.findIndex(function(p){return p.id===h})>=0?h:0,true);
+goTo(0,true);   // 默认进入总览（不恢复上次停留的面板）
 }
 })();
