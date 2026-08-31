@@ -802,6 +802,6 @@ document.addEventListener('keydown',function(e){
   if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT')return;
   if(e.key==='ArrowLeft')goTo(cur-1);
   if(e.key==='ArrowRight')goTo(cur+1)});
-goTo(0,true);   // 默认进入总览（不恢复上次停留的面板）
+goTo(0);   // 默认进入总览（不恢复上次停留的面板），并同步地址栏
 }
 })();
